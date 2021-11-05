@@ -4,10 +4,10 @@ import pickle
 import tensorflow as tf
 from tensorflow.keras.callbacks import Callback
 
-from model import TrainTranslator
-from config import Config
-from preprocess import Vectorizer
-from loss import MaskedLoss
+from .model import TrainTranslator
+from .config import Config
+from .preprocess import Vectorizer
+from .loss import MaskedLoss
 
 from datetime import datetime
 
@@ -44,21 +44,33 @@ def clean_dup_nan(df):
 
 
 def train(verbose=True):
+    str_date = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
+    
     if verbose:
         print("Load Dataframe")
 
-    df_train = pd.read_csv("../../data/train.csv")
-    df_val = pd.read_csv("../../data/val.csv")
-    df_test = pd.read_csv("../../data/test.csv")
+    start = datetime.now()
+    df_train = pd.read_csv("data/filtered/train.csv")
+    df_val = pd.read_csv("data/filtered/val.csv")
+    df_test = pd.read_csv("data/filtered/test.csv")
+
+    if verbose:
+        print(f"Time Taken {datetime.now() - start}")
 
     if verbose:
         print("Clean Dataframe")
 
+    start = datetime.now()
     df_train = clean_dup_nan(df_train)
     df_val = clean_dup_nan(df_val)
     df_test = clean_dup_nan(df_test)
 
-    df_train = df_train.sample(Config.sample)
+    if Config.sample:
+        df_train = df_train.sample(Config.sample)
+
+    if verbose:
+        print(f"Time Taken {datetime.now() - start}")
+        print(f"Total data train --> {len(df_train)}")
 
     output_texts = df_train["en"].values
     input_texts = df_train["id"].values
@@ -66,6 +78,7 @@ def train(verbose=True):
     if verbose:
         print("Vectorizing")
 
+    start = datetime.now()
     vectorizer = Vectorizer(Config, input_texts, output_texts)
     input_conf = {
         "config": vectorizer.input_text_processor.get_config(),
@@ -77,12 +90,15 @@ def train(verbose=True):
     }
     pickle.dump(
         input_conf,
-        open(f"../../bin/input_text_processor_attention.pkl", "wb"),
+        open(f"bin/input_text_processor_attention_{str_date}.pkl", "wb"),
     )
     pickle.dump(
         output_conf,
-        open(f"../../bin/output_text_processor_attention.pkl", "wb"),
+        open(f"bin/output_text_processor_attention_{str_date}.pkl", "wb"),
     )
+
+    if verbose:
+        print(f"Time Taken {datetime.now() - start}")
 
     if verbose:
         print("Building Model")
@@ -98,13 +114,9 @@ def train(verbose=True):
     train_translator.fit(
         vectorizer.dataset, epochs=Config.epochs, callbacks=[batch_loss]
     )
-    str_date = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
 
     save_layer(
         train_translator.encoder,
         train_translator.decoder,
-        f"../../bin/attention_{str_date}.h5",
+        f"bin/attention_{str_date}.h5",
     )
-
-if __name__ == "__main__":
-    train()

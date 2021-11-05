@@ -1,5 +1,5 @@
 import tensorflow as tf
-from layers import Encoder, Decoder, DecoderInput
+from src.attention.layers import Encoder, Decoder, DecoderInput
 
 
 class TrainTranslator(tf.keras.Model):

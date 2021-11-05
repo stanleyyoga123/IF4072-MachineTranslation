@@ -1,10 +1,10 @@
 class Config:
-    sample = 10
-    epochs = 1
+    sample = 0
+    epochs = 5
 
-    max_seq_len = 128
-    max_vocab_size = 5000
-    batch_size = 8
+    max_seq_len = 12
+    max_vocab_size = 100000
+    batch_size = 64
 
     embedding_dim = 512
     units = 128
