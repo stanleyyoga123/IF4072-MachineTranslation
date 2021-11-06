@@ -115,8 +115,12 @@ def train(verbose=True):
         vectorizer.dataset, epochs=Config.epochs, callbacks=[batch_loss]
     )
 
-    save_layer(
+    pickle.dump(
         train_translator.encoder,
+        open(f"bin/attention_encoder_{str_date}.pkl", "wb")
+    )
+
+    pickle.dump(
         train_translator.decoder,
-        f"bin/attention_{str_date}.h5",
+        open(f"bin/attention_decoder_{str_date}.pkl", "wb")
     )
