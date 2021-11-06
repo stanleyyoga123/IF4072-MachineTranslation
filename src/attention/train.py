@@ -2,6 +2,7 @@ import pandas as pd
 import pickle
 
 import tensorflow as tf
+from tensorflow.keras import Sequential
 from tensorflow.keras.callbacks import Callback
 
 from .model import TrainTranslator
@@ -42,10 +43,20 @@ def clean_dup_nan(df):
     ret = ret.reset_index(drop=True)
     return ret
 
+def save_vectorizer(input_text_processor, output_text_processor, str_date):
+    adapter = Sequential()
+    adapter.add((tf.keras.Input(shape=(1,), dtype=tf.string)))
+    adapter.add(input_text_processor)
+    adapter.save(f'bin/input_vectorizer_{str_date}', save_format='tf')
+
+    adapter = Sequential()
+    adapter.add((tf.keras.Input(shape=(1,), dtype=tf.string)))
+    adapter.add(output_text_processor)
+    adapter.save(f'bin/output_vectorizer_{str_date}', save_format='tf')
 
 def train(verbose=True):
     str_date = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
-    
+
     if verbose:
         print("Load Dataframe")
 
@@ -80,22 +91,7 @@ def train(verbose=True):
 
     start = datetime.now()
     vectorizer = Vectorizer(Config, input_texts, output_texts)
-    input_conf = {
-        "config": vectorizer.input_text_processor.get_config(),
-        "weights": vectorizer.input_text_processor.get_weights(),
-    }
-    output_conf = {
-        "config": vectorizer.output_text_processor.get_config(),
-        "weights": vectorizer.output_text_processor.get_weights(),
-    }
-    pickle.dump(
-        input_conf,
-        open(f"bin/input_text_processor_attention_{str_date}.pkl", "wb"),
-    )
-    pickle.dump(
-        output_conf,
-        open(f"bin/output_text_processor_attention_{str_date}.pkl", "wb"),
-    )
+    save_vectorizer(vectorizer.input_text_processor, vectorizer.output_text_processor, str_date)
 
     if verbose:
         print(f"Time Taken {datetime.now() - start}")
@@ -116,11 +112,9 @@ def train(verbose=True):
     )
 
     pickle.dump(
-        train_translator.encoder,
-        open(f"bin/attention_encoder_{str_date}.pkl", "wb")
+        train_translator.encoder, open(f"bin/attention_encoder_{str_date}.pkl", "wb")
     )
 
     pickle.dump(
-        train_translator.decoder,
-        open(f"bin/attention_decoder_{str_date}.pkl", "wb")
+        train_translator.decoder, open(f"bin/attention_decoder_{str_date}.pkl", "wb")
     )

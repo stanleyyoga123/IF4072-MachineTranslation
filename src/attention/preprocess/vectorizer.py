@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
-
+@tf.keras.utils.register_keras_serializable()
 def clean(text):
     text = tf.strings.lower(text)
     text = tf.strings.regex_replace(text, "[^ a-z.?!,¿]", "")
