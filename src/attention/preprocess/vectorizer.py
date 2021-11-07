@@ -7,7 +7,7 @@ def clean(text):
     text = tf.strings.regex_replace(text, "[^ a-z.?!,¿]", "")
     text = tf.strings.regex_replace(text, "[.?!,¿]", r" \0 ")
     text = tf.strings.strip(text)
-    text = tf.strings.join(["<start>", text, "<end>"], separator=" ")
+    text = tf.strings.join(["[START]", text, "[END]"], separator=" ")
     return text
 
 class Vectorizer:

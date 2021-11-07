@@ -1,6 +1,6 @@
 class Config:
     sample = 0
-    epochs = 5
+    epochs = 10
 
     max_seq_len = 12
     max_vocab_size = 100000

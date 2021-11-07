@@ -2,7 +2,7 @@ import tensorflow as tf
 
 
 def translate():
-    date_used = "2021-11-07 08.53.00"
+    date_used = "2021-11-07 12.28.05"
 
     translator = tf.saved_model.load(f'bin/translator_{date_used}')
     while True:

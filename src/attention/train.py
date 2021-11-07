@@ -38,7 +38,6 @@ def clean_dup_nan(df):
     ret = ret.reset_index(drop=True)
     return ret
 
-
 def train(verbose=True):
     str_date = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
 
