@@ -5,7 +5,7 @@ import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.callbacks import Callback
 
-from .model import TrainTranslator
+from .model import TrainTranslator, Translator
 from .config import Config
 from .preprocess import Vectorizer
 from .loss import MaskedLoss
@@ -32,27 +32,12 @@ class AdapterModel(tf.keras.Model):
         self.decoder = decoder
 
 
-def save_layer(encoder, decoder, path):
-    adapter = AdapterModel(encoder, decoder)
-    adapter.save_weights(path)
-
-
 def clean_dup_nan(df):
     ret = df.dropna()
     ret = ret.drop(ret[ret.duplicated()].index)
     ret = ret.reset_index(drop=True)
     return ret
 
-def save_vectorizer(input_text_processor, output_text_processor, str_date):
-    adapter = Sequential()
-    adapter.add((tf.keras.Input(shape=(1,), dtype=tf.string)))
-    adapter.add(input_text_processor)
-    adapter.save(f'bin/input_vectorizer_{str_date}', save_format='tf')
-
-    adapter = Sequential()
-    adapter.add((tf.keras.Input(shape=(1,), dtype=tf.string)))
-    adapter.add(output_text_processor)
-    adapter.save(f'bin/output_vectorizer_{str_date}', save_format='tf')
 
 def train(verbose=True):
     str_date = datetime.now().strftime("%Y-%m-%d %H.%M.%S")
@@ -91,7 +76,6 @@ def train(verbose=True):
 
     start = datetime.now()
     vectorizer = Vectorizer(Config, input_texts, output_texts)
-    save_vectorizer(vectorizer.input_text_processor, vectorizer.output_text_processor, str_date)
 
     if verbose:
         print(f"Time Taken {datetime.now() - start}")
@@ -111,10 +95,11 @@ def train(verbose=True):
         vectorizer.dataset, epochs=Config.epochs, callbacks=[batch_loss]
     )
 
-    pickle.dump(
-        train_translator.encoder, open(f"bin/attention_encoder_{str_date}.pkl", "wb")
+    translator = Translator(
+        encoder=train_translator.encoder,
+        decoder=train_translator.decoder,
+        input_text_processor=train_translator.input_text_processor,
+        output_text_processor=train_translator.output_text_processor
     )
-
-    pickle.dump(
-        train_translator.decoder, open(f"bin/attention_decoder_{str_date}.pkl", "wb")
-    )
+    tf.saved_model.save(translator, f'bin/translator_{str_date}',
+                    signatures={'serving_default': translator.tf_translate})

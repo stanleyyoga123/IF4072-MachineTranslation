@@ -71,7 +71,7 @@ class Translator(tf.Module):
             dec_result, dec_state = self.decoder(dec_input, state=dec_state)
             attention.append(dec_result.attention_weights)
 
-            new_tokens = self.sample(dec_result.logits.to_tensor(), temperature)
+            new_tokens = self.sample(dec_result.logits, temperature)
             done = done | (new_tokens == self.end_token)
             new_tokens = tf.where(done, tf.constant(0, dtype=tf.int64), new_tokens)
 
@@ -87,3 +87,7 @@ class Translator(tf.Module):
             return {"text": result_text, "attention": attention_stack}
         else:
             return {"text": result_text}
+
+    @tf.function(input_signature=[tf.TensorSpec(dtype=tf.string, shape=[None])])
+    def tf_translate(self, input_text):
+        return self.translate(input_text)
