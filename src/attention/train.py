@@ -102,3 +102,4 @@ def train(verbose=True):
     )
     tf.saved_model.save(translator, f'bin/translator_{str_date}',
                     signatures={'serving_default': translator.tf_translate})
+    train_translator.save_weights(f'bin/weights', save_format='tf')
