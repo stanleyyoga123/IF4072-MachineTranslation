@@ -25,7 +25,13 @@ class Decoder(tf.keras.layers.Layer):
 
         self.embedding = tf.keras.layers.Embedding(output_vocab_size, embedding_dim)
 
-        self.gru = tf.keras.layers.GRU(
+        self.gru1 = tf.keras.layers.GRU(
+            dec_units,
+            return_sequences=True,
+            return_state=True,
+            recurrent_initializer="glorot_uniform",
+        )
+        self.gru2 = tf.keras.layers.GRU(
             dec_units,
             return_sequences=True,
             return_state=True,
@@ -38,7 +44,8 @@ class Decoder(tf.keras.layers.Layer):
 
     def __call__(self, inputs, state=None):
         vectors = self.embedding(inputs.new_tokens)
-        rnn_output, state = self.gru(vectors, initial_state=state)
+        rnn_output, state = self.gru1(vectors, initial_state=state)
+        rnn_output, state = self.gru2(rnn_output, initial_state=state)
         context_vector, attention_weights = self.attention(
             query=rnn_output, value=inputs.enc_output, mask=inputs.mask
         )

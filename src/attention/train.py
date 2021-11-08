@@ -46,7 +46,6 @@ def train(verbose=True):
 
     start = datetime.now()
     df_train = pd.read_csv("data/filtered/train.csv")
-    df_val = pd.read_csv("data/filtered/val.csv")
     df_test = pd.read_csv("data/filtered/test.csv")
 
     if verbose:
@@ -57,7 +56,6 @@ def train(verbose=True):
 
     start = datetime.now()
     df_train = clean_dup_nan(df_train)
-    df_val = clean_dup_nan(df_val)
     df_test = clean_dup_nan(df_test)
 
     if Config.sample:

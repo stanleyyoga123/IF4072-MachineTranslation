@@ -1,9 +1,7 @@
 import tensorflow as tf
 
 
-def translate():
-    date_used = "2021-11-07 05.37.44"
-
+def translate(date_used):
     translator = tf.saved_model.load(f'bin/translator_{date_used}')
     while True:
         str_in = input("Put text here: ")

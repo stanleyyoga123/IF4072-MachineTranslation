@@ -8,7 +8,13 @@ class Encoder(Layer):
 
         self.embedding = Embedding(vocab_size, embedding_dim)
 
-        self.gru = GRU(
+        self.gru1 = GRU(
+            enc_units,
+            return_sequences=True,
+            return_state=True,
+            recurrent_initializer="glorot_uniform",
+        )
+        self.gru2 = GRU(
             enc_units,
             return_sequences=True,
             return_state=True,
@@ -17,5 +23,6 @@ class Encoder(Layer):
 
     def __call__(self, tokens, state=None):
         vectors = self.embedding(tokens)
-        output, state = self.gru(vectors, initial_state=state)
+        output, state = self.gru1(vectors, initial_state=state)
+        output, state = self.gru2(output, initial_state=state)
         return output, state
