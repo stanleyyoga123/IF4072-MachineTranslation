@@ -51,7 +51,7 @@ class Translator(tf.Module):
         return new_tokens
 
     def translate(
-        self, input_text, *, max_length=50, return_attention=True, temperature=1.0
+        self, input_text, *, max_length=50, return_attention=True, temperature=0.0
     ):
         batch_size = tf.shape(input_text)[0]
         input_tokens = self.input_text_processor(input_text)
