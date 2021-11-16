@@ -1,8 +1,8 @@
 import argparse
 import pytorch_lightning as pl
 
-from model import T5FineTuner
-from config import Config
+from .model import T5FineTuner
+from .config import Config
 
 def train():
     hparams = {
