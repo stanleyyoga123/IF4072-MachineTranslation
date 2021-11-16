@@ -1,5 +1,5 @@
 if __name__ == '__main__':
-    use = 't5'
+    use = 'attention'
 
     if use == 't5':
         from src.t5.train import train
@@ -14,4 +14,4 @@ if __name__ == '__main__':
         from src.attention.evaluate import evaluate
 
         # Do Something
-        translate()
+        translate('2021-11-08 21.56.14')

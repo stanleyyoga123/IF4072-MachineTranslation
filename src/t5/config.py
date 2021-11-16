@@ -1,6 +1,6 @@
 class Config:
-    test_data = 'data/test.csv'
-    train_data = 'data/train.csv'
+    test_data = 'data/filtered/test.csv'
+    train_data = 'data/filtered/train.csv'
     model_name = 't5-base'
     tokenizer_name = 't5-base'
     learning_rate = 3e-4
@@ -13,4 +13,4 @@ class Config:
     warmup_steps = 0
     n_gpu = 1
     num_train_epochs = 5
-    model_dir = 'model'
+    model_dir = 'model-nmt'
